@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#302116">
+<meta name="description" content="NNN 2026 Challenge November completion certificate generator for entertainment and personal use.">
+<title>NNN 2026 Challenge — Certificate Generator</title>
+<style>
+  :root{--ink:#382719;--brown:#5a3d25;--gold:#b18a3b;--gold-light:#dfc887;--cream:#f5ecd8;--paper:#fbf5e8;--muted:#786957;--line:#d7c49b}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(circle at top,#fff9ed 0,#efe4d0 55%,#e4d4ba 100%);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
+  .site-header{padding:30px 18px 24px;text-align:center;background:#302116;color:#fff3d8;border-bottom:4px solid var(--gold)}
+  .site-header h1{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.7rem,4vw,2.6rem);letter-spacing:.12em}
+  .site-header p{margin:7px 0 0;color:#e3d1ad}
+  main{width:min(1240px,100%);margin:0 auto;padding:24px 18px 44px}
+  .panel{background:rgba(255,251,242,.92);border:1px solid #d8c6a3;border-radius:16px;box-shadow:0 12px 35px #49351b12;padding:22px;margin-bottom:22px}
+  .panel h2{margin:0 0 14px;font-family:Georgia,"Times New Roman",serif;font-size:1.45rem}
+  .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  .field{display:flex;flex-direction:column;gap:7px;min-width:0}
+  label{font-weight:700;font-size:.94rem}
+  input,select{width:100%;padding:12px 13px;border:1px solid #c8b48c;border-radius:9px;background:#fffdf7;color:var(--ink);font:inherit}
+  input:focus,select:focus,button:focus-visible{outline:3px solid #d3ac51;outline-offset:2px}
+  .helper{font-size:.82rem;color:var(--muted)}
+  .status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+  .status-card{padding:13px;border:1px solid #e0d1b1;border-radius:10px;background:#f8f0df}
+  .status-label{display:block;text-transform:uppercase;letter-spacing:.08em;font-size:.72rem;color:#78634a;font-weight:800}
+  .status-value{display:block;font-weight:750;margin-top:4px;overflow-wrap:anywhere}
+  .countdown-row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:15px;padding:14px 16px;border-radius:10px;background:#3c2a1c;color:#fff1d1}
+  .countdown-row strong{display:block;font-family:Georgia,"Times New Roman",serif;font-size:1.2rem}
+  #countdown{font-variant-numeric:tabular-nums;font-weight:800;letter-spacing:.06em}
+  #statusMessage{margin:12px 0 0;font-weight:700}
+  .locked{color:#8b3a25}.ready{color:#24643c}
+  .button-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  button{border:1px solid #7c5a2f;border-radius:9px;padding:11px 16px;font:inherit;font-weight:750;cursor:pointer;background:#f4e4bd;color:#3c2919;transition:transform .15s,filter .15s}
+  button:hover:not(:disabled){filter:brightness(.97);transform:translateY(-1px)}
+  button:disabled{opacity:.55;cursor:not-allowed}
+  .primary{background:#4a3020;color:#fff2d3;border-color:#4a3020}
+  .gold{background:#b18a3b;color:#24180e;border-color:#9a752d}
+  .preview-heading{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  .preview-heading h2{margin:0}
+  .preview-shell{overflow-x:auto;padding:8px 2px 16px;overscroll-behavior-x:contain}
+  #certificate{width:1120px;height:792px;flex:none;position:relative;overflow:hidden;margin:0 auto;background:var(--cream);color:var(--ink);font-family:Georgia,"Times New Roman",serif;isolation:isolate}
+  #certificate:before{content:"";position:absolute;inset:0;z-index:-2;background:radial-gradient(ellipse at 50% 35%,#fff9e9 0,#f5ecd8 68%,#e9d9b9 100%);opacity:1}
+  #certificate:after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.14;background-image:repeating-linear-gradient(0deg,#8c6d3d 0,#8c6d3d .5px,transparent .5px,transparent 4px),repeating-linear-gradient(90deg,#8c6d3d 0,#8c6d3d .35px,transparent .35px,transparent 5px)}
+  .cert-border{position:absolute;inset:23px;border:3px double #9a742e}
+  .cert-border-inner{position:absolute;inset:34px;border:1px solid #c4a65e}
+  .corner{position:absolute;width:92px;height:92px;color:#a98436;opacity:.95}
+  .corner svg{width:100%;height:100%}
+  .corner.tl{top:29px;left:29px}.corner.tr{top:29px;right:29px;transform:scaleX(-1)}.corner.bl{bottom:29px;left:29px;transform:scaleY(-1)}.corner.br{bottom:29px;right:29px;transform:scale(-1)}
+  .cert-content{position:absolute;inset:65px 86px 55px;display:flex;align-items:center;flex-direction:column;text-align:center}
+  .cert-brand{font-size:27px;letter-spacing:.24em;font-weight:700;color:#745021;margin-top:2px}
+  .cert-rule{height:1px;width:260px;background:linear-gradient(90deg,transparent,#a47c2e,transparent);margin:15px auto 13px}
+  .cert-title{font-size:39px;letter-spacing:.12em;line-height:1.12;margin:0;color:#3c2919;font-weight:700}
+  .cert-month{font-family:system-ui,sans-serif;font-size:14px;letter-spacing:.34em;font-weight:800;color:#99712d;margin-top:12px}
+  .cert-intro{font-size:20px;font-style:italic;margin:26px 0 5px;color:#6e5337}
+  #certName{font-size:47px;font-weight:700;line-height:1.14;max-width:850px;overflow-wrap:anywhere;color:#3d2818;border-bottom:1px solid #b9954b;padding:0 22px 8px;min-width:400px}
+  .cert-statement{font-size:19px;line-height:1.55;max-width:830px;margin:17px auto 0}
+  .cert-praise{font-size:17px;font-style:italic;color:#755b3b;margin:11px 0 0}
+  .cert-meta{position:absolute;left:4px;right:4px;bottom:1px;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:end;gap:20px;width:100%}
+  .meta-block{font-family:system-ui,sans-serif;font-size:11px;letter-spacing:.04em;color:#6e5638;text-align:center}
+  .meta-label{display:block;border-top:1px solid #bba16b;padding-top:7px;font-weight:800;letter-spacing:.1em}
+  #certNumber{font-weight:800;font-size:12px;overflow-wrap:anywhere}
+  .seal{position:absolute;right:0;bottom:40px;width:110px;height:110px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff0bd;background:radial-gradient(circle,#c6a34e 0,#9b742c 72%,#79551e 73%);border:4px double #f3dda0;box-shadow:0 2px 5px #60451b55;transform:rotate(8deg);font-family:Georgia,serif}
+  .seal:before{content:"";position:absolute;inset:8px;border:1px solid #f0d58b;border-radius:50%}
+  .seal strong{font-size:24px;letter-spacing:.06em;line-height:1.1}.seal span{font-size:15px;letter-spacing:.18em}
+  .signature{position:absolute;left:0;bottom:42px;width:190px;text-align:center;color:#3b291b}
+  #certSignature{font-family:"Brush Script MT","Segoe Script",cursive;font-size:31px;font-style:italic;line-height:1.05}
+  .signature-rule{height:1px;background:#bba16b;margin:5px 0 6px}
+  .signature small{font-family:system-ui,sans-serif;font-size:10px;letter-spacing:.1em;font-weight:800}
+  .disclaimer{background:#f7efdf;border:1px solid #b18a3b;border-left:5px solid #8d682b;border-radius:12px;padding:18px 20px;margin-top:22px;color:#493522}
+  .disclaimer h2{font-family:Georgia,serif;margin:0 0 8px;font-size:1.35rem}
+  .disclaimer p{margin:7px 0}
+  .disclaimer .emphasis{font-weight:850;color:#713d20}
+  .technical{font-size:.86rem;color:#76634c;margin-top:14px}
+  .toast{min-height:1.5em;color:#8b3a25;font-weight:700;margin:10px 0 0}
+  footer{text-align:center;padding:18px;color:#735f48;font-size:.85rem}
+  @media(max-width:720px){main{padding:16px 12px 30px}.panel{padding:16px}.form-grid,.status-grid{grid-template-columns:1fr}.site-header{padding:24px 14px}.countdown-row{align-items:flex-start;flex-direction:column}}
+  @media print{
+    @page{size:A4 landscape;margin:0}
+    html,body{margin:0!important;padding:0!important;background:#fff!important;width:297mm;height:210mm;overflow:hidden}
+    body *{visibility:hidden!important}
+    #certificate,#certificate *{visibility:visible!important}
+    #certificate{position:fixed!important;left:0!important;top:0!important;width:297mm!important;height:210mm!important;margin:0!important;transform:none!important;box-shadow:none!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .cert-border{inset:6mm}.cert-border-inner{inset:9mm}
+    .corner{width:24mm;height:24mm}
+    .corner.tl{top:7mm;left:7mm}.corner.tr{top:7mm;right:7mm}.corner.bl{bottom:7mm;left:7mm}.corner.br{bottom:7mm;right:7mm}
+    .cert-content{inset:17mm 23mm 14mm}
+    .cert-brand{font-size:7mm}.cert-rule{margin:3mm auto 2mm}
+    .cert-title{font-size:10mm}.cert-month{font-size:3.5mm;margin-top:3mm}
+    .cert-intro{font-size:5mm;margin:6mm 0 1mm}
+    #certName{font-size:12mm;padding-bottom:2mm}
+    .cert-statement{font-size:4.6mm;margin-top:4mm}
+    .cert-praise{font-size:4mm;margin-top:2mm}
+    .cert-meta{bottom:0;gap:5mm}.meta-block{font-size:2.5mm}.meta-label{padding-top:1.5mm}
+    #certNumber{font-size:2.7mm}
+    .seal{width:27mm;height:27mm;right:0;bottom:10mm}.seal strong{font-size:6mm}.seal span{font-size:4mm}
+    .signature{bottom:10mm;width:48mm}#certSignature{font-size:8mm}.signature small{font-size:2.4mm}
+  }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <h1>NNN 2026 CHALLENGE</h1>
+  <p>November 2026 Completion Certificate Generator</p>
+</header>
+<main>
+  <section class="panel" aria-labelledby="generator-title">
+    <h2 id="generator-title">Certificate Generator</h2>
+    <div class="form-grid">
+      <div class="field">
+        <label for="nameInput">Participant Name</label>
+        <input id="nameInput" type="text" maxlength="70" autocomplete="name" placeholder="Enter participant name" aria-describedby="name-help">
+        <span class="helper" id="name-help">Up to 70 characters. The preview updates as you type.</span>
+      </div>
+      <div class="field">
+        <label for="categorySelect">Category</label>
+        <select id="categorySelect">
+          <option>General</option><option>OBC</option><option>SC/ST</option><option>EWS/PWD</option>
+        </select>
+        <span class="helper">Changing the name or category invalidates a previously generated certificate.</span>
+      </div>
+    </div>
+    <div class="status-grid" aria-live="polite">
+      <div class="status-card"><span class="status-label">Selected category</span><span class="status-value" id="selectedCategory">General</span></div>
+      <div class="status-card"><span class="status-label">Required duration</span><span class="status-value" id="requiredDuration">30 days</span></div>
+      <div class="status-card"><span class="status-label">Unlock date/time (IST)</span><span class="status-value" id="unlockDisplay">1 December 2026, 12:00 AM IST</span></div>
+    </div>
+    <div class="countdown-row">
+      <div><strong id="eligibilityStatus">Certificate Locked</strong><span>Eligibility countdown</span></div>
+      <div id="countdown" aria-live="off">XXd XXh XXm XXs</div>
+    </div>
+    <p id="statusMessage" class="locked" role="status">Certificate is locked until the selected category's unlock time.</p>
+    <div class="button-row">
+      <button class="primary" id="generateBtn" type="button">Generate Certificate</button>
+      <button id="pngBtn" type="button">Download PNG</button>
+      <button id="pdfBtn" class="gold" type="button">Download PDF</button>
+      <button id="printBtn" type="button">Print</button>
+      <button id="resetBtn" type="button">Reset</button>
+    </div>
+    <p class="toast" id="actionMessage" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="panel" aria-labelledby="preview-title">
+    <div class="preview-heading"><h2 id="preview-title">Certificate Preview</h2><span class="helper">A4 landscape · Scroll horizontally on smaller screens</span></div>
+    <div class="preview-shell">
+      <div id="certificate" aria-label="NNN 2026 Challenge completion certificate">
+        <div class="cert-border"></div><div class="cert-border-inner"></div>
+        <div class="corner tl" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none"><path d="M7 92V7H92M13 82Q36 75 32 49Q57 53 61 28Q77 39 91 13M18 68L29 79M32 49L21 37M61 28L50 16M42 65Q57 68 65 54Q78 59 84 43" stroke="currentColor" stroke-width="2.5"/><circle cx="31" cy="49" r="4" fill="currentColor"/><circle cx="61" cy="28" r="4" fill="currentColor"/></svg></div>
+        <div class="corner tr" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none"><path d="M7 92V7H92M13 82Q36 75 32 49Q57 53 61 28Q77 39 91 13M18 68L29 79M32 49L21 37M61 28L50 16M42 65Q57 68 65 54Q78 59 84 43" stroke="currentColor" stroke-width="2.5"/><circle cx="31" cy="49" r="4" fill="currentColor"/><circle cx="61" cy="28" r="4" fill="currentColor"/></svg></div>
+        <div class="corner bl" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none"><path d="M7 92V7H92M13 82Q36 75 32 49Q57 53 61 28Q77 39 91 13M18 68L29 79M32 49L21 37M61 28L50 16M42 65Q57 68 65 54Q78 59 84 43" stroke="currentColor" stroke-width="2.5"/><circle cx="31" cy="49" r="4" fill="currentColor"/><circle cx="61" cy="28" r="4" fill="currentColor"/></svg></div>
+        <div class="corner br" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none"><path d="M7 92V7H92M13 82Q36 75 32 49Q57 53 61 28Q77 39 91 13M18 68L29 79M32 49L21 37M61 28L50 16M42 65Q57 68 65 54Q78 59 84 43" stroke="currentColor" stroke-width="2.5"/><circle cx="31" cy="49" r="4" fill="currentColor"/><circle cx="61" cy="28" r="4" fill="currentColor"/></svg></div>
+        <div class="cert-content">
+          <div class="cert-brand">NNN 2026 CHALLENGE</div>
+          <div class="cert-rule"></div>
+          <h2 class="cert-title">COMPLETION CERTIFICATE</h2>
+          <div class="cert-month">NOVEMBER 2026</div>
+          <p class="cert-intro">This is to certify that</p>
+          <div id="certName">PARTICIPANT NAME</div>
+          <p class="cert-statement">has successfully completed the NNN 2026 Challenge in the <strong id="certCategory">General</strong> category for <strong id="certDuration">30 days</strong>.</p>
+          <p class="cert-praise">Your dedication, discipline and commitment are truly commendable.</p>
+          <div class="signature">
+            <div id="certSignature">Santy</div>
+            <div class="signature-rule"></div>
+            <small>AUTHORISED SIGNATORY</small>
+          </div>
+          <div class="seal" aria-label="NNN 2026 seal"><strong>NNN</strong><span>2026</span></div>
+          <div class="cert-meta">
+            <div class="meta-block"><span id="certNumber">CERTIFICATE NO. NNN26-PENDING</span><span class="meta-label">CERTIFICATE NUMBER</span></div>
+            <div class="meta-block"><span id="certDate">—</span><span class="meta-label">DATE OF GENERATION (IST)</span></div>
+            <div class="meta-block"><span id="certCategoryMeta">General</span><span class="meta-label">CATEGORY</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <aside class="disclaimer" aria-labelledby="disclaimer-title">
+      <h2 id="disclaimer-title">Disclaimer</h2>
+      <p>This website and all certificates generated through it are provided for entertainment and personal-use purposes only.</p>
+      <p>The generated certificate is not an official document and does not represent or verify any government, educational, employment, legal, medical, or institutional status.</p>
+      <p>This website is an independent project and is not affiliated with, endorsed by, or officially connected to any organization unless explicitly stated.</p>
+      <p class="emphasis">Entertainment Only — Not an Official Certificate.</p>
+    </aside>
+    <p class="technical">Technical note: eligibility checks run in your browser and are not cryptographically tamper-proof. Genuine independent verification would require a server.</p>
+  </section>
+</main>
+<footer>NNN 2026 Challenge · Entertainment and personal use only</footer>
+
+<!-- CDN dependencies: html2canvas for PNG and html2pdf.js (which bundles html2canvas and jsPDF) for PDF. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+<script>
+"use strict";
+
+// Category configuration uses fixed UTC timestamps, independent of visitor timezone.
+const CATEGORIES = {
+  "General": { duration: "30 days", unlockUTC: "2026-11-30T18:30:00Z" },
+  "OBC": { duration: "28.5 days", unlockUTC: "2026-11-29T06:30:00Z" },
+  "SC/ST": { duration: "17 days", unlockUTC: "2026-11-17T18:30:00Z" },
+  "EWS/PWD": { duration: "5 hours", unlockUTC: "2026-10-31T23:30:00Z" }
+};
+
+const nameInput = document.getElementById("nameInput");
+const categorySelect = document.getElementById("categorySelect");
+const selectedCategory = document.getElementById("selectedCategory");
+const requiredDuration = document.getElementById("requiredDuration");
+const unlockDisplay = document.getElementById("unlockDisplay");
+const eligibilityStatus = document.getElementById("eligibilityStatus");
+const countdown = document.getElementById("countdown");
+const statusMessage = document.getElementById("statusMessage");
+const actionMessage = document.getElementById("actionMessage");
+const generateBtn = document.getElementById("generateBtn");
+const pngBtn = document.getElementById("pngBtn");
+const pdfBtn = document.getElementById("pdfBtn");
+const printBtn = document.getElementById("printBtn");
+const resetBtn = document.getElementById("resetBtn");
+const certName = document.getElementById("certName");
+const certCategory = document.getElementById("certCategory");
+const certDuration = document.getElementById("certDuration");
+const certNumber = document.getElementById("certNumber");
+const certDate = document.getElementById("certDate");
+const certCategoryMeta = document.getElementById("certCategoryMeta");
+const certSignature = document.getElementById("certSignature");
+const certificate = document.getElementById("certificate");
+
+let certificateGenerated = false;
+let generatedForName = "";
+let generatedForCategory = "";
+let countdownTimer = null;
+
+function selectedConfig() {
+  return CATEGORIES[categorySelect.value] || CATEGORIES.General;
+}
+function unlockTimestamp() {
+  return Date.parse(selectedConfig().unlockUTC);
+}
+
+// Eligibility: re-check the fixed UTC unlock timestamp with Date.now() before every protected action.
+function isUnlocked() {
+  return Date.now() >= unlockTimestamp();
+}
+function formatUnlockIST(iso) {
+  return new Intl.DateTimeFormat("en-IN", {
+    timeZone: "Asia/Kolkata", day: "numeric", month: "long", year: "numeric",
+    hour: "numeric", minute: "2-digit", hour12: true
+  }).format(new Date(iso)) + " IST";
+}
+function formatCertificateDateIST() {
+  return new Intl.DateTimeFormat("en-IN", {
+    timeZone: "Asia/Kolkata", day: "2-digit", month: "long", year: "numeric"
+  }).format(new Date());
+}
+function sanitizeParticipantName(value) {
+  // Remove angle brackets rather than allowing HTML-like markup in the participant field.
+  return String(value).slice(0, 70).replace(/[<>]/g, "");
+}
+function safeFileName(value) {
+  const cleaned = String(value || "Participant").normalize("NFKD")
+    .replace(/[<>:"/\\|?*\x00-\x1F]/g, "")
+    .replace(/\s+/g, "_").replace(/[^\w.-]/g, "").replace(/^\.+/, "")
+    .slice(0, 70);
+  return cleaned || "Participant";
+}
+function setActionMessage(message, isError = true) {
+  actionMessage.textContent = message;
+  actionMessage.style.color = isError ? "#8b3a25" : "#24643c";
+}
+function invalidateGeneratedCertificate() {
+  certificateGenerated = false;
+  generatedForName = "";
+  generatedForCategory = "";
+  certNumber.textContent = "CERTIFICATE NO. NNN26-PENDING";
+  certDate.textContent = "—";
+}
+function updateLiveCertificateFields() {
+  const safeName = sanitizeParticipantName(nameInput.value);
+  if (safeName !== nameInput.value) nameInput.value = safeName;
+  certName.textContent = safeName.trim() || "PARTICIPANT NAME";
+  const category = categorySelect.value;
+  certCategory.textContent = category;
+  certCategoryMeta.textContent = category;
+  certDuration.textContent = selectedConfig().duration;
+  // Permanent Santy signatory: never derive the signature from participant input.
+  certSignature.textContent = "Santy";
+}
+function updateCategoryDetails() {
+  const category = categorySelect.value;
+  const config = selectedConfig();
+  selectedCategory.textContent = category;
+  requiredDuration.textContent = config.duration;
+  unlockDisplay.textContent = formatUnlockIST(config.unlockUTC);
+  updateLiveCertificateFields();
+  updateCountdown();
+}
+
+// Countdown: update every second and transition automatically from locked to READY at zero.
+function updateCountdown() {
+  const remaining = Math.max(0, unlockTimestamp() - Date.now());
+  if (remaining <= 0) {
+    countdown.textContent = "00d 00h 00m 00s";
+    eligibilityStatus.textContent = "Certificate Unlocked";
+    statusMessage.textContent = "READY — eligibility time reached. Generate a certificate to enable exports.";
+    statusMessage.className = "ready";
+    return;
+  }
+  const totalSeconds = Math.floor(remaining / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  countdown.textContent = `${String(days).padStart(2,"0")}d ${String(hours).padStart(2,"0")}h ${String(minutes).padStart(2,"0")}m ${String(seconds).padStart(2,"0")}s`;
+  eligibilityStatus.textContent = "Certificate Locked";
+  statusMessage.textContent = "Certificate is locked until the selected category's unlock time.";
+  statusMessage.className = "locked";
+}
+function makeCertificateNumber() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = new Uint8Array(6);
+  if (window.crypto && typeof window.crypto.getRandomValues === "function") {
+    window.crypto.getRandomValues(bytes);
+  } else {
+    for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+  }
+  let result = "";
+  for (const byte of bytes) result += alphabet[byte % alphabet.length];
+  return "NNN26-" + result;
+}
+
+// Certificate generation: create a number/date only after eligibility is confirmed.
+function generateCertificate() {
+  if (!isUnlocked()) {
+    setActionMessage("The certificate is not available yet. Please wait until the countdown reaches zero.");
+    updateCountdown();
+    return;
+  }
+  updateLiveCertificateFields();
+  certNumber.textContent = "CERTIFICATE NO. " + makeCertificateNumber();
+  certDate.textContent = formatCertificateDateIST();
+  certificateGenerated = true;
+  generatedForName = sanitizeParticipantName(nameInput.value).trim();
+  generatedForCategory = categorySelect.value;
+  setActionMessage("Certificate generated. PNG, PDF and Print are now available.", false);
+}
+function isCurrentGeneratedCertificate() {
+  return certificateGenerated &&
+    generatedForName === sanitizeParticipantName(nameInput.value).trim() &&
+    generatedForCategory === categorySelect.value;
+}
+function validateExport() {
+  // Re-check eligibility immediately before each export/print action.
+  if (!isUnlocked()) {
+    setActionMessage("The certificate is not available yet. Please wait until the countdown reaches zero.");
+    updateCountdown();
+    return false;
+  }
+  if (!isCurrentGeneratedCertificate()) {
+    setActionMessage("Please generate the certificate again before downloading or printing.");
+    return false;
+  }
+  // Permanent Santy signatory is explicitly restored before every output action.
+  certSignature.textContent = "Santy";
+  return true;
+}
+
+// PNG generation: export only the certificate element at 2x scale.
+async function downloadPNG() {
+  if (!validateExport()) return;
+  if (typeof window.html2canvas !== "function") {
+    setActionMessage("PNG library failed to load. Check your internet connection and try again.");
+    return;
+  }
+  const oldText = pngBtn.textContent;
+  pngBtn.disabled = true;
+  pngBtn.textContent = "Creating PNG...";
+  try {
+    const canvas = await html2canvas(certificate, {
+      scale: 2, useCORS: true, backgroundColor: "#f5ecd8",
+      width: 1120, height: 792, windowWidth: 1120, windowHeight: 792,
+      scrollX: 0, scrollY: 0
+    });
+    const link = document.createElement("a");
+    link.download = "NNN_2026_Certificate_" + safeFileName(nameInput.value.trim()) + ".png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+    setActionMessage("PNG downloaded.", false);
+  } catch (error) {
+    console.error("PNG export failed:", error);
+    setActionMessage("Could not create the PNG. Please try again in a modern browser.");
+  } finally {
+    pngBtn.disabled = false;
+    pngBtn.textContent = oldText;
+    certSignature.textContent = "Santy";
+  }
+}
+
+// PDF generation: html2pdf.js exports only #certificate as A4 landscape.
+async function downloadPDF() {
+  if (!validateExport()) return;
+  if (typeof window.html2pdf !== "function") {
+    setActionMessage("PDF library failed to load. Check your internet connection and try again.");
+    return;
+  }
+  const oldText = pdfBtn.textContent;
+  pdfBtn.disabled = true;
+  pdfBtn.textContent = "Creating PDF...";
+  try {
+    const options = {
+      margin: 0,
+      filename: "NNN_2026_Certificate_" + safeFileName(nameInput.value.trim()) + ".pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: "#f5ecd8", width: 1120, height: 792, windowWidth: 1120 },
+      jsPDF: { unit: "mm", format: "a4", orientation: "landscape", compress: true },
+      pagebreak: { mode: ["avoid-all"] }
+    };
+    await window.html2pdf().set(options).from(certificate).save();
+    setActionMessage("PDF downloaded.", false);
+  } catch (error) {
+    console.error("PDF export failed:", error);
+    setActionMessage("Could not create the PDF. Please try again in a modern browser.");
+  } finally {
+    pdfBtn.disabled = false;
+    pdfBtn.textContent = oldText;
+    certSignature.textContent = "Santy";
+  }
+}
+
+// Print: browser print CSS hides all website UI and prints only the certificate.
+function printCertificate() {
+  if (!validateExport()) return;
+  certSignature.textContent = "Santy";
+  window.print();
+}
+window.addEventListener("afterprint", () => { certSignature.textContent = "Santy"; });
+
+nameInput.addEventListener("input", () => {
+  updateLiveCertificateFields();
+  invalidateGeneratedCertificate();
+  setActionMessage("Name changed. Generate the certificate again before exporting.");
+});
+categorySelect.addEventListener("change", () => {
+  invalidateGeneratedCertificate();
+  updateCategoryDetails();
+  setActionMessage("Category changed. Generate the certificate again before exporting.");
+});
+generateBtn.addEventListener("click", generateCertificate);
+pngBtn.addEventListener("click", downloadPNG);
+pdfBtn.addEventListener("click", downloadPDF);
+printBtn.addEventListener("click", printCertificate);
+
+// Reset restores all initial certificate state and refreshes countdown immediately.
+resetBtn.addEventListener("click", () => {
+  nameInput.value = "";
+  categorySelect.value = "General";
+  invalidateGeneratedCertificate();
+  certName.textContent = "PARTICIPANT NAME";
+  certCategory.textContent = "General";
+  certDuration.textContent = "30 days";
+  certCategoryMeta.textContent = "General";
+  certSignature.textContent = "Santy";
+  actionMessage.textContent = "";
+  updateCategoryDetails();
+  setActionMessage("Form reset.", false);
+});
+
+updateCategoryDetails();
+updateLiveCertificateFields();
+countdownTimer = window.setInterval(updateCountdown, 1000);
+</script>
+</body>
+</html>
